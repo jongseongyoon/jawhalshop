@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>장애인희망복지과 주문 시스템 QR코드</title>
+    <script src="https://cdn.jsdelivr.net/npm/qrcode-generator@1.4.4/qrcode.min.js"></script>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+        }
+        .qr-container {
+            margin: 20px 0;
+        }
+        .instructions {
+            color: #666;
+            max-width: 400px;
+            margin: 20px auto;
+            text-align: left;
+        }
+        .url {
+            color: #3498db;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>장애인희망복지과 주문 시스템</h1>
+        <div class="qr-container" id="qrcode"></div>
+        <div class="url" id="url"></div>
+        <div class="instructions">
+            <p>1. 스마트폰 카메라로 QR코드를 스캔하세요.</p>
+            <p>2. 열리는 링크를 터치하여 주문 시스템에 접속하세요.</p>
+            <p>3. 휴대폰 번호로 로그인 후 이용하실 수 있습니다.</p>
+        </div>
+    </div>
+    <script>
+        const url = 'https://jongseongyoon.github.io/jawhalshop';
+        
+        // QR 코드 생성
+        const qr = qrcode(0, 'M');
+        qr.addData(url);
+        qr.make();
+        
+        // QR 코드 표시
+        document.getElementById('qrcode').innerHTML = qr.createImgTag(5);
+        document.getElementById('url').textContent = url;
+    </script>
+</body>
+</html> 
