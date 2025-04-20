@@ -22,23 +22,7 @@ document.addEventListener('DOMContentLoaded', function() {
             login();
         }
     });
-
-    // QR 코드 생성
-    generateQRCode();
 });
-
-// QR 코드 생성
-function generateQRCode() {
-    const currentURL = window.location.href;
-    const qrcode = new QRCode(document.getElementById("qrcode"), {
-        text: currentURL,
-        width: 128,
-        height: 128,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-    });
-}
 
 // 상위 카테고리 목록 표시
 function displayMainCategories() {
@@ -98,7 +82,6 @@ function updateProducts() {
     tbody.innerHTML = '';
     
     if (mainCategory && selectedItem) {
-        // 선택된 상호와 품목에 해당하는 상품 찾기
         const product = config.products.find(p => 
             p.mainCategory === mainCategory && 
             p.name === selectedItem
@@ -110,17 +93,17 @@ function updateProducts() {
                 product.price.toLocaleString() + '원' : 
                 product.price;
             
+            tr.className = 'product-card';
             tr.innerHTML = `
-                <td>${product.name}</td>
-                <td>${priceDisplay}</td>
-                <td>${product.unit}</td>
-                <td>${product.mainCategory}</td>
-                <td>
+                <div class="product-actions">
                     <input type="number" class="quantity-input" min="1" value="1">
-                </td>
-                <td>
-                    <button onclick="addToCart(this)" data-product='${JSON.stringify(product)}'>담기</button>
-                </td>
+                    <button onclick="addToCart(this)" data-product='${JSON.stringify(product)}' class="add-btn">담기</button>
+                </div>
+                <div class="product-info">
+                    <span class="product-name">${product.name}</span>
+                    <span class="product-price">${priceDisplay}</span>
+                    <span class="product-business">${product.mainCategory}</span>
+                </div>
             `;
             tbody.appendChild(tr);
         }
@@ -174,29 +157,32 @@ function updateCart() {
     tbody.innerHTML = '';
     
     cart.forEach((item, index) => {
-        const tr = document.createElement('tr');
+        const cartItem = document.createElement('div');
         const total = typeof item.price === 'number' ? 
             item.price * item.quantity : 
             '가격협의';
         
-        tr.innerHTML = `
-            <td>${item.mainCategory}</td>
-            <td>${item.name}</td>
-            <td>${typeof item.price === 'number' ? item.price.toLocaleString() : item.price}원</td>
-            <td>${item.unit}</td>
-            <td>${item.quantity}</td>
-            <td>${typeof total === 'number' ? total.toLocaleString() + '원' : total}</td>
-            <td>
+        cartItem.className = 'cart-item-card';
+        cartItem.innerHTML = `
+            <div class="cart-item-header">
+                <div class="cart-item-info">
+                    <span class="product-name">${item.name}</span>
+                    <span class="product-business">${item.mainCategory}</span>
+                </div>
+            </div>
+            <div class="cart-item-details">
+                <span class="cart-item-price">단가: ${typeof item.price === 'number' ? item.price.toLocaleString() : item.price}원</span>
+                <span class="cart-item-quantity">수량: ${item.quantity}</span>
+                <span class="cart-item-total">합계: ${typeof total === 'number' ? total.toLocaleString() + '원' : total}</span>
+            </div>
+            <div class="cart-item-actions">
                 <button onclick="removeFromCart(${index})" class="delete-btn">삭제</button>
-            </td>
+            </div>
         `;
-        tbody.appendChild(tr);
+        tbody.appendChild(cartItem);
     });
     
-    // 총 주문 금액 업데이트
     updateTotal();
-    
-    // 현재 장바구니 상태 저장
     saveCart();
 }
 
@@ -208,7 +194,26 @@ function updateTotal() {
         }
         return sum;
     }, 0);
-    document.getElementById('totalAmount').textContent = total.toLocaleString();
+    
+    // 총 금액 표시 업데이트
+    const totalElement = document.getElementById('totalAmount');
+    if (total === 0) {
+        totalElement.innerHTML = `
+            <p>
+                <span class="total-label">장바구니가 비어있습니다</span>
+            </p>
+        `;
+    } else {
+        totalElement.innerHTML = `
+            <p>
+                <span class="total-label">총 주문 금액</span>
+                <span class="total-amount">${total.toLocaleString()}원</span>
+            </p>
+            <div class="system-contact">
+                시스템 문의 장애인희망복지과 062-360-7641
+            </div>
+        `;
+    }
 }
 
 // 로그인 처리
@@ -226,6 +231,11 @@ function login() {
         alert('올바른 휴대폰 번호를 입력해주세요.');
         return;
     }
+    
+    // 로그인 성공 시 장바구니 초기화
+    cart = [];
+    saveCart();
+    updateCart();
     
     currentUser = phoneNumber;
     document.getElementById('userPhone').textContent = phoneNumber;
