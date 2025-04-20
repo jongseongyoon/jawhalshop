@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>자활상품 주문 시스템</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4CAF50">
+    <link rel="apple-touch-icon" href="icons/icon-192x192.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <meta name="apple-mobile-web-app-title" content="주문시스템">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode.js@1.0.0/qrcode.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <!-- 로그인 폼 -->
+        <div id="loginForm" class="login-form">
+            <h1>자활상품 주문 시스템</h1>
+            <div class="form-group">
+                <label for="phoneLogin">휴대폰 번호</label>
+                <input type="tel" id="phoneLogin" placeholder="010-0000-0000" required>
+            </div>
+            <button onclick="login()" class="login-btn">로그인</button>
+        </div>
+
+        <!-- 주문 폼 (로그인 후 표시) -->
+        <div id="orderForm" class="order-form" style="display: none;">
+            <div class="user-info">
+                <span id="userPhone"></span>
+                <button onclick="logout()" class="logout-btn">로그아웃</button>
+            </div>
+            
+            <h2>주문자 정보</h2>
+            <div class="customer-info">
+                <div class="form-group">
+                    <label for="customerName">이름</label>
+                    <input type="text" id="customerName" required>
+                </div>
+                <div class="form-group">
+                    <label for="department">담당과</label>
+                    <input type="text" id="department" required>
+                </div>
+            </div>
+
+            <h2>주문 상품</h2>
+            <div class="category-filter">
+                <div class="form-group">
+                    <label for="mainCategory">상호</label>
+                    <select id="mainCategory" onchange="updateSubCategories()">
+                        <option value="">선택하세요</option>
+                        <option value="내친구김">내친구김</option>
+                        <option value="드림공방">드림공방</option>
+                        <option value="산타떡볶이">산타떡볶이</option>
+                        <option value="세차&새차">세차&새차</option>
+                        <option value="슬림샐러드">슬림샐러드</option>
+                        <option value="화이트세탁">화이트세탁</option>
+                        <option value="희망이네두부">희망이네두부</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="subCategory">품목</label>
+                    <select id="subCategory" onchange="updateProducts()">
+                        <option value="">선택하세요</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="product-selection">
+                <table id="productTable">
+                    <thead>
+                        <tr>
+                            <th>품목명</th>
+                            <th>가격</th>
+                            <th>단위</th>
+                            <th>상호</th>
+                            <th>주문수량</th>
+                            <th>작업</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="cart-section">
+                <h2>장바구니</h2>
+                <table id="cartTable">
+                    <thead>
+                        <tr>
+                            <th>상호</th>
+                            <th>품목</th>
+                            <th>가격</th>
+                            <th>단위</th>
+                            <th>수량</th>
+                            <th>합계</th>
+                            <th>삭제</th>
+                        </tr>
+                    </thead>
+                    <tbody id="cartTableBody">
+                    </tbody>
+                </table>
+                <div class="cart-total">
+                    <p>총 주문 금액: <span id="totalAmount">0</span>원</p>
+                </div>
+            </div>
+
+            <button onclick="submitOrder()" class="submit-btn">주문하기</button>
+
+            <!-- 결제 링크 섹션 추가 -->
+            <div id="paymentSection" class="payment-section" style="display: none;">
+                <h3>카카오페이로 결제하기</h3>
+                <p>아래 링크를 클릭하여 계좌이체를 진행해주세요.</p>
+                <a href="https://qr.kakaopay.com/FT6QUikWY" target="_blank" class="kakao-pay-btn">
+                    카카오페이 결제하기
+                </a>
+            </div>
+
+            <!-- QR 코드 섹션 추가 -->
+            <div id="qrSection" class="qr-section">
+                <h3>웹사이트 공유</h3>
+                <p>아래 QR 코드를 스캔하여 주문 시스템에 접속하세요.</p>
+                <div id="qrcode"></div>
+            </div>
+        </div>
+    </div>
+    <script>
+        // 서비스 워커 등록
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+    <script src="config.js"></script>
+    <script src="script.js"></script>
+</body>
+</html> 
